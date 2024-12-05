@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className}antialiased`}>
-        <div className="flex gap-8">
+        <div className="flex">
           <SideBar />
           {children}
         </div>
