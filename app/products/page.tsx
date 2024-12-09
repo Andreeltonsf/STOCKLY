@@ -1,11 +1,11 @@
 import { PlusIcon } from "lucide-react";
 import { Button } from "../_components/ui/button";
 import { DataTable } from "../_components/ui/data-table";
-import getProducts from "../_data-acess/product/get-products";
 import { ProductsTableColumns } from "./_components/table-columns";
 
 const ProductsPages = async () => {
-  const products = await getProducts();
+  const response = await fetch("http://localhost:3000/api/products");
+  const products = await response.json()
   return (
     <div className="w-full space-y-8 p-8 bg-white rounded-lg ml-8 mt-8 px-8 py-8" >
       
@@ -21,7 +21,7 @@ const ProductsPages = async () => {
               Novo Produto
             </Button>
          </div>
-         <DataTable columns={ProductsTableColumns} data={products} />
+         <DataTable columns={ProductsTableColumns} data={JSON.parse(JSON.stringify(products))} />
     </div>
   );
 };
