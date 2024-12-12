@@ -1,10 +1,12 @@
 import { db } from "@/app/_lib/prisma"
 
 
+//Apenas para referênciaa
+
 export async function GET() {
   const products = await db.product.findMany({})
-
-  return Response.json(products,{
+  const ramdomNumber = Math.random()
+  return Response.json({products, ramdomNumber},{
     status: 200,
   })
 }

@@ -39,6 +39,7 @@ export const ProductsTableColumns: ColumnDef<Product>[] = [
     header: "Status",
     cell: (row) => {
       const product = row.row.original
+      
       const label = getStatusLabel(product.status)
       return (
       <Badge variant={label === 'Em Estoque'? 'default' :'outline'  }  className="gap-1.5">
