@@ -4,6 +4,7 @@ import SideBar from "./_components/SideBar";
 import "./global.css";
 
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], display: "auto" });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
           <SideBar />
           {children}
         </div>
+        <Toaster />
       </body>
     </html>
   );

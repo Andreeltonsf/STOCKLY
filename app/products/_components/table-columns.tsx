@@ -1,12 +1,12 @@
 "use client"
 
-
+import { AlertDialog, AlertDialogTrigger } from "@/app/_components/ui/alert-dialog"
 import { Badge } from "@/app/_components/ui/badge"
 import { Button } from "@/app/_components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/_components/ui/dropdown-menu"
-import { Product } from "@prisma/client"
 import { ColumnDef } from "@tanstack/react-table"
 import { CircleIcon, ClipboardCopyIcon, EditIcon, MoreHorizontalIcon, Trash2Icon } from "lucide-react"
+import DeleteAlertDialog from "./delete-dialog"
 
 export type Payment = {
   id: string
@@ -56,7 +56,8 @@ export const ProductsTableColumns: ColumnDef<Product>[] = [
     header: "Ações",
     cell:(row) =>{
       const product = row.row.original
-      return (
+      return ( 
+      <AlertDialog>
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost">
@@ -73,12 +74,21 @@ export const ProductsTableColumns: ColumnDef<Product>[] = [
               <EditIcon size={16}/>
               Editar
             </DropdownMenuItem>
-            <DropdownMenuItem className="gap-1.5">
-              <Trash2Icon size={16}/>
-              Excluir
-            </DropdownMenuItem>
+                <AlertDialogTrigger asChild>
+            
+                  <DropdownMenuItem className="gap-1.5">
+                         <Trash2Icon size={16}/>
+                          Excluir
+                    </DropdownMenuItem>
+
+                </AlertDialogTrigger>
           </DropdownMenuContent>
         </DropdownMenu>
+        
+        <DeleteAlertDialog id={product.id}/>
+      </AlertDialog>
+        
+        
 
       );
     }
