@@ -2,9 +2,11 @@
 
 
 import { Badge } from "@/app/_components/ui/badge"
+import { Button } from "@/app/_components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/_components/ui/dropdown-menu"
 import { Product } from "@prisma/client"
 import { ColumnDef } from "@tanstack/react-table"
-import { CircleIcon } from "lucide-react"
+import { CircleIcon, ClipboardCopyIcon, EditIcon, MoreHorizontalIcon, Trash2Icon } from "lucide-react"
 
 export type Payment = {
   id: string
@@ -49,4 +51,36 @@ export const ProductsTableColumns: ColumnDef<Product>[] = [
 
     }
   }, 
+  {
+    accessorKey:"actions",
+    header: "Ações",
+    cell:(row) =>{
+      const product = row.row.original
+      return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">
+                <MoreHorizontalIcon size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+          <DropdownMenuContent>
+          
+            <DropdownMenuItem className="gap-1.5">
+              <ClipboardCopyIcon size={16} onClick={() => navigator.clipboard.writeText(product.id)}/> 
+              Copiar ID
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-1.5" >
+              <EditIcon size={16}/>
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-1.5">
+              <Trash2Icon size={16}/>
+              Excluir
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+      );
+    }
+  }
 ]
