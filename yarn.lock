@@ -3446,6 +3446,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"next-safe-action@npm:^7.10.2":
+  version: 7.10.2
+  resolution: "next-safe-action@npm:7.10.2"
+  peerDependencies:
+    "@sinclair/typebox": ">= 0.33.3"
+    next: ">= 14.0.0"
+    react: ">= 18.2.0"
+    react-dom: ">= 18.2.0"
+    valibot: ">= 0.36.0"
+    yup: ">= 1.0.0"
+    zod: ">= 3.0.0"
+  peerDependenciesMeta:
+    "@sinclair/typebox":
+      optional: true
+    valibot:
+      optional: true
+    yup:
+      optional: true
+    zod:
+      optional: true
+  checksum: 10c0/968dd9962d5b33c64c40b00f0b13b9d1d24b1839ea119f14cdd0269e0dcce98d50380202d375bf1968ca63b79d64fa3a78192882f3416cea30239fc82d5bf060
+  languageName: node
+  linkType: hard
+
 "next-themes@npm:^0.4.4":
   version: 0.4.4
   resolution: "next-themes@npm:0.4.4"
@@ -4453,6 +4477,7 @@ __metadata:
     eslint-config-next: "npm:14.2.10"
     lucide-react: "npm:^0.465.0"
     next: "npm:14.2.10"
+    next-safe-action: "npm:^7.10.2"
     next-themes: "npm:^0.4.4"
     postcss: "npm:^8"
     prisma: "npm:^6.0.1"
