@@ -1,6 +1,7 @@
 "use server"
 
 import { db } from "@/app/_lib/prisma";
+import { revalidatePath } from "next/cache";
 import { createSaleSchema, CreateSaleSchema } from "./schema";
 
 
@@ -37,5 +38,18 @@ export const createSale = async (data: CreateSaleSchema) => {
         unitPrice: productFromDb.price,
       },
     });
+
+    await db.product.update({
+      where: {
+        id: product.id,
+      },
+      data: {
+        stock: {
+          decrement: product.quantity,
+        },
+      },
+    })
   }
+
+  revalidatePath("/products");
 }

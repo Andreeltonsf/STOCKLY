@@ -13,8 +13,7 @@ interface ProductTableDropdownMenuProps {
 
 const SalesTableDropdownMenu = ({product, onDelete}: ProductTableDropdownMenuProps) => {
   return (
-   
-    
+
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost">

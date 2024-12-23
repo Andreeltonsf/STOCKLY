@@ -32,18 +32,19 @@ type FormSchema = z.infer<typeof formSchema>;
 
 interface UpsertSheetContentProps{
   products: Product[];
-  productOptions: ComboboxOption[]
+  productOptions: ComboboxOption[];
+  setSheetIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 interface SelectedProduct{
   id: string;
   name: string;
   price: number;
-  quantity: number    
+  quantity: number; 
 }
 
 
-const UpsertSheetContent = ({products, productOptions}: UpsertSheetContentProps) => {
+const UpsertSheetContent = ({products, productOptions, setSheetIsOpen}: UpsertSheetContentProps) => {
 
   const [selectedProduct, setSelectedProduct] = useState<SelectedProduct[]>([])
 
@@ -60,16 +61,19 @@ const onSubmit = (data: FormSchema) => {
   if(!selectedProduct) return;
 
   setSelectedProduct((currentProducts) => {
-    const existingProduct = currentProducts.find((product) => product.id === selectedProduct.id);
+    const existingProduct = currentProducts.find(
+      (products) => products.id === selectedProduct.id,
+    );
     if (existingProduct) {
-
-      const productIsOutOfStock = existingProduct.quantity + data.quantity > selectedProduct.stock;
-
-      if(productIsOutOfStock ){
+      const productIsOutOfStock =
+        existingProduct.quantity + data.quantity > selectedProduct.stock;
+      if (productIsOutOfStock) {
         form.setError("quantity", {
-          message:"O estoque do produto é insuficiente."});
-          return currentProducts;
+          message: "Quantidade indisponível em estoque.",
+        });
+        return currentProducts;
       }
+      form.reset();
       return currentProducts.map((product) => {
         if (product.id === selectedProduct.id) {
           return {
@@ -86,9 +90,9 @@ const onSubmit = (data: FormSchema) => {
         return currentProducts;
     } form.reset()
     return [...currentProducts, {...selectedProduct,price: Number(selectedProduct.price), quantity: data.quantity}]
-  })
+  });
 
-  form.reset()
+  form.reset();
 
 }
 
@@ -116,6 +120,7 @@ const onSubmitSale = async () => {
       })),
     });
     toast.success("Venda salva com sucesso.");
+    setSheetIsOpen(false);
 
 
   }catch(error){
