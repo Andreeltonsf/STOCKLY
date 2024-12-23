@@ -53,7 +53,7 @@ const ProductDropdown = ({product}: ProductTableDropdownMenuProps) => {
           price: Number(product.price),
           stock: product.stock,
         }}
-            onSuccess={() => setEditDialogOpen(false)}
+           setDialogIsOpen={setEditDialogOpen}
         
         />
         <DeleteAlertDialog id={product.id}/>

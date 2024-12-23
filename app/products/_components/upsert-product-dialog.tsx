@@ -15,12 +15,12 @@ import {
   DialogTitle,
 } from "@/app/_components/ui/dialog";
 import {
+  Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
-  Form,
 } from "@/app/_components/ui/form";
 import { Input } from "@/app/_components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +34,7 @@ import { toast } from "sonner";
 interface UpsertProductDialogContentProps {
   defaultValues?: UpsertProductSchema;
   setDialogIsOpen: Dispatch<SetStateAction<boolean>>;
+  
 }
 
 const UpsertProductDialogContent = ({

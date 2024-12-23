@@ -4,6 +4,7 @@ import { Badge } from "@/app/_components/ui/badge"
 import { ColumnDef } from "@tanstack/react-table"
 import { CircleIcon } from "lucide-react"
 import ProductDropdown from "./product-dropdawn"
+import { Product } from "@prisma/client"
 
 
 export type Payment = {
