@@ -6,7 +6,7 @@ import { Combobox, ComboboxOption } from "@/app/_components/ui/combobox";
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/app/_components/ui/table";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@prisma/client";
-import { PlusIcon, } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "../../_components/ui/input";
 import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../../_components/ui/sheet";
 import { formatCurrency } from "../../_helpers/current";
+import SalesTableDropdownMenu from "./table-dropdown-menu";
 
 const formSchema = z.object({
   productId: z.string().uuid({
@@ -83,6 +84,14 @@ const productsTotal = useMemo(() => {
 },[selectedProduct]);
 
 
+
+const handleDeleteProduct = (productId: string) => {
+  setSelectedProduct((currentProducts) => {
+    return currentProducts.filter((product) => product.id !== productId);
+  });
+};
+
+
   return (
     <SheetContent className="!max-w-[700px]">
       <SheetHeader>
@@ -140,6 +149,7 @@ const productsTotal = useMemo(() => {
       <Table>
         <TableCaption>Lista dos produtos adicionados à venda.</TableCaption>
         <TableHeader>
+          
           <TableRow>
             <TableHead>Produto</TableHead>
             <TableHead>Preço Unitário</TableHead>
@@ -158,7 +168,7 @@ const productsTotal = useMemo(() => {
                 {formatCurrency(product.price * product.quantity)}
               </TableCell>
               <TableCell>
-               
+                  <SalesTableDropdownMenu product={product} onDelete={handleDeleteProduct}/>
               </TableCell>
             </TableRow>
           ))}
