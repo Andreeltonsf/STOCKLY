@@ -1,0 +1,16 @@
+import { z } from "zod";
+
+
+
+
+
+export const createSaleSchema =z.object({
+  products:z.array(z.object({
+    id:z.string().uuid(),
+    quantity:z.number().int().min(1).positive()
+
+  }))
+})
+
+
+export type CreateSaleSchema = z.infer<typeof createSaleSchema>;

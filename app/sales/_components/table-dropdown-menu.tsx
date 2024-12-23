@@ -27,13 +27,10 @@ const SalesTableDropdownMenu = ({product, onDelete}: ProductTableDropdownMenuPro
           <ClipboardCopyIcon size={16} /> 
           Copiar ID
         </DropdownMenuItem>
-        
-            
-        
-              <DropdownMenuItem className="gap-1.5" onClick={()=> onDelete(product.id)}>
-                     <Trash2Icon size={16}/>
+        <DropdownMenuItem className="gap-1.5" onClick={()=> onDelete(product.id)}>
+            <Trash2Icon size={16}/>
                       Excluir
-                </DropdownMenuItem>
+        </DropdownMenuItem>
 
             
       </DropdownMenuContent>

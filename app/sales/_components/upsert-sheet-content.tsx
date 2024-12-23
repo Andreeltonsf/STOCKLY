@@ -1,18 +1,20 @@
 "use client";
 
 
+import { createSale } from "@/app/_actions/sales/create-sale";
 import { Button } from "@/app/_components/ui/button";
 import { Combobox, ComboboxOption } from "@/app/_components/ui/combobox";
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/app/_components/ui/table";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@prisma/client";
-import { PlusIcon } from "lucide-react";
+import { CheckIcon, PlusIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../_components/ui/form";
 import { Input } from "../../_components/ui/input";
-import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../../_components/ui/sheet";
+import { SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../../_components/ui/sheet";
 import { formatCurrency } from "../../_helpers/current";
 import SalesTableDropdownMenu from "./table-dropdown-menu";
 
@@ -60,6 +62,14 @@ const onSubmit = (data: FormSchema) => {
   setSelectedProduct((currentProducts) => {
     const existingProduct = currentProducts.find((product) => product.id === selectedProduct.id);
     if (existingProduct) {
+
+      const productIsOutOfStock = existingProduct.quantity + data.quantity > selectedProduct.stock;
+
+      if(productIsOutOfStock ){
+        form.setError("quantity", {
+          message:"O estoque do produto é insuficiente."});
+          return currentProducts;
+      }
       return currentProducts.map((product) => {
         if (product.id === selectedProduct.id) {
           return {
@@ -67,9 +77,14 @@ const onSubmit = (data: FormSchema) => {
             quantity: product.quantity + data.quantity,
           };
         }
-        return product;
       });
     }
+    const productIsOutOfStock = data.quantity > selectedProduct.stock;
+    if(productIsOutOfStock ){
+      form.setError("quantity", {
+        message:"O estoque do produto é insuficiente."});
+        return currentProducts;
+    } form.reset()
     return [...currentProducts, {...selectedProduct,price: Number(selectedProduct.price), quantity: data.quantity}]
   })
 
@@ -91,6 +106,22 @@ const handleDeleteProduct = (productId: string) => {
   });
 };
 
+
+const onSubmitSale = async () => {
+  try{
+    await createSale({
+      products: selectedProduct.map((product) => ({
+        id: product.id,
+        quantity: product.quantity,
+      })),
+    });
+    toast.success("Venda salva com sucesso.");
+
+
+  }catch(error){
+    toast.error("Ocorreu um erro ao salvar a venda.");
+  } 
+};
 
   return (
     <SheetContent className="!max-w-[700px]">
@@ -182,7 +213,12 @@ const handleDeleteProduct = (productId: string) => {
         </TableFooter>
       </Table>
 
-      
+      <SheetFooter className="pt-6">
+        <Button className="w-full gap-2" disabled={productsTotal === 0} onClick={onSubmitSale} >
+          <CheckIcon size={20}/>
+          Finalizar venda
+        </Button>
+      </SheetFooter>
     </SheetContent>
   );
 };
