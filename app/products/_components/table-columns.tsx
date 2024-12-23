@@ -55,3 +55,4 @@ export const ProductsTableColumns: ColumnDef<Product>[] = [
     cell:(row) => <ProductDropdown product={row.row.original}/>
   }
 ]
+
