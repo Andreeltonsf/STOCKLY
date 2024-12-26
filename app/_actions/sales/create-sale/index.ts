@@ -7,8 +7,9 @@ import { createSaleSchema, CreateSaleSchema } from "./schema";
 
 
 export const createSale = async (data: CreateSaleSchema) => {
-  createSaleSchema.parse(data)
-  const sale = await db.sale.create({
+  createSaleSchema.parse(data) 
+  await db.$transaction(async (trx) => {
+       const sale = await trx.sale.create({
     data: {
       date: new Date(),
 
@@ -30,7 +31,7 @@ export const createSale = async (data: CreateSaleSchema) => {
       throw new Error("O estoque do produto é insuficiente.");
     }
     
-    await db.saleProduct.create({
+    await trx.saleProduct.create({
       data: {
         saleId: sale.id,
         productId: product.id,
@@ -39,7 +40,7 @@ export const createSale = async (data: CreateSaleSchema) => {
       },
     });
 
-    await db.product.update({
+    await trx.product.update({
       where: {
         id: product.id,
       },
@@ -52,4 +53,6 @@ export const createSale = async (data: CreateSaleSchema) => {
   }
 
   revalidatePath("/products");
+  })
+ 
 }

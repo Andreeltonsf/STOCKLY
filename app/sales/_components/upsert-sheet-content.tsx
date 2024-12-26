@@ -8,10 +8,10 @@ import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, Tabl
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@prisma/client";
 import { CheckIcon, PlusIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import {  z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../_components/ui/form";
 import { Input } from "../../_components/ui/input";
 import { SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../../_components/ui/sheet";
@@ -36,7 +36,7 @@ interface UpsertSheetContentProps{
   setSheetIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-interface SelectedProduct{
+interface SelectedProducts{
   id: string;
   name: string;
   price: number;
@@ -46,7 +46,7 @@ interface SelectedProduct{
 
 const UpsertSheetContent = ({products, productOptions, setSheetIsOpen}: UpsertSheetContentProps) => {
 
-  const [selectedProduct, setSelectedProduct] = useState<SelectedProduct[]>([])
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProducts[]>([])
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -56,17 +56,36 @@ const UpsertSheetContent = ({products, productOptions, setSheetIsOpen}: UpsertSh
     },
   }
   );
-const onSubmit = (data: FormSchema) => {
-  const selectedProduct = products.find((product) => product.id === data.productId);
-  if(!selectedProduct) return;
-
-  setSelectedProduct((currentProducts) => {
-    const existingProduct = currentProducts.find(
-      (products) => products.id === selectedProduct.id,
+  const onSubmit = (data: FormSchema) => {
+    const selectedProduct = products.find(
+      (product) => product.id === data.productId,
     );
-    if (existingProduct) {
-      const productIsOutOfStock =
-        existingProduct.quantity + data.quantity > selectedProduct.stock;
+    if (!selectedProduct) return;
+    setSelectedProducts((currentProducts) => {
+      const existingProduct = currentProducts.find(
+        (product) => product.id === selectedProduct.id,
+      );
+      if (existingProduct) {
+        const productIsOutOfStock =
+          existingProduct.quantity + data.quantity > selectedProduct.stock;
+        if (productIsOutOfStock) {
+          form.setError("quantity", {
+            message: "Quantidade indisponível em estoque.",
+          });
+          return currentProducts;
+        }
+        form.reset();
+        return currentProducts.map((product) => {
+          if (product.id === selectedProduct.id) {
+            return {
+              ...product,
+              quantity: product.quantity + data.quantity,
+            };
+          }
+          return product;
+        });
+      }
+      const productIsOutOfStock = data.quantity > selectedProduct.stock;
       if (productIsOutOfStock) {
         form.setError("quantity", {
           message: "Quantidade indisponível em estoque.",
@@ -74,59 +93,47 @@ const onSubmit = (data: FormSchema) => {
         return currentProducts;
       }
       form.reset();
-      return currentProducts.map((product) => {
-        if (product.id === selectedProduct.id) {
-          return {
-            ...product,
-            quantity: product.quantity + data.quantity,
-          };
-        }
-      });
-    }
-    const productIsOutOfStock = data.quantity > selectedProduct.stock;
-    if(productIsOutOfStock ){
-      form.setError("quantity", {
-        message:"O estoque do produto é insuficiente."});
-        return currentProducts;
-    } form.reset()
-    return [...currentProducts, {...selectedProduct,price: Number(selectedProduct.price), quantity: data.quantity}]
-  });
-
+      return [
+        ...currentProducts,
+        {
+          ...selectedProduct,
+          price: Number(selectedProduct.price),
+          quantity: data.quantity,
+        },
+      ];
+    });
+  };
   form.reset();
 
-}
 
 const productsTotal = useMemo(() => {
-  return selectedProduct.reduce((acc, product) => {
+  return selectedProducts.reduce((acc, product) => {
     return acc + product.price * product.quantity;
   }, 0);
-},[selectedProduct]);
-
-
+}, [selectedProducts]);
 
 const handleDeleteProduct = (productId: string) => {
-  setSelectedProduct((currentProducts) => {
+  setSelectedProducts((currentProducts) => {
     return currentProducts.filter((product) => product.id !== productId);
   });
 };
 
-
 const onSubmitSale = async () => {
   try{
     await createSale({
-      products: selectedProduct.map((product) => ({
+      products: selectedProducts.map((product) => ({
         id: product.id,
         quantity: product.quantity,
       })),
     });
     toast.success("Venda salva com sucesso.");
-    setSheetIsOpen(false);
-
-
-  }catch(error){
-    toast.error("Ocorreu um erro ao salvar a venda.");
-  } 
+    setSheetIsOpen(false); 
+  } catch (error) {
+    
+    toast.error("Erro ao salvar a venda.");
+  }
 };
+
 
   return (
     <SheetContent className="!max-w-[700px]">
@@ -195,7 +202,7 @@ const onSubmitSale = async () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {selectedProduct.map((product) => (
+          {selectedProducts.map((product) => (
             <TableRow key={product.id}>
               <TableCell>{product.name}</TableCell>
               <TableCell>{formatCurrency(product.price)}</TableCell>
