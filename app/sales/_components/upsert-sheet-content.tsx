@@ -1,20 +1,45 @@
-"use client";
-
+"use client"
 
 import { createSale } from "@/app/_actions/sales/create-sale";
 import { Button } from "@/app/_components/ui/button";
 import { Combobox, ComboboxOption } from "@/app/_components/ui/combobox";
-import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/app/_components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/app/_components/ui/table";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@prisma/client";
 import { CheckIcon, PlusIcon } from "lucide-react";
+import {
+  flattenValidationErrors
+} from "next-safe-action";
+import { useAction } from "next-safe-action/hooks";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {  z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../_components/ui/form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../_components/ui/form";
 import { Input } from "../../_components/ui/input";
-import { SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "../../_components/ui/sheet";
+import {
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "../../_components/ui/sheet";
 import { formatCurrency } from "../../_helpers/current";
 import SalesTableDropdownMenu from "./table-dropdown-menu";
 
@@ -23,44 +48,58 @@ const formSchema = z.object({
     message: "O produto é obrigatório",
   }),
   quantity: z.coerce.number().int().min(1).positive(),
-  
-})
-
+});
 
 type FormSchema = z.infer<typeof formSchema>;
 
-
-interface UpsertSheetContentProps{
+interface UpsertSheetContentProps {
   products: Product[];
   productOptions: ComboboxOption[];
   setSheetIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-interface SelectedProducts{
+interface SelectedProducts {
   id: string;
   name: string;
   price: number;
-  quantity: number; 
+  quantity: number;
 }
 
+const UpsertSheetContent = ({
+  products,
+  productOptions,
+  setSheetIsOpen,
+}: UpsertSheetContentProps) => {
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProducts[]>(
+    [],
+  );
 
-const UpsertSheetContent = ({products, productOptions, setSheetIsOpen}: UpsertSheetContentProps) => {
+  const { execute: executeCreateSale } = useAction(createSale, {
+    onError: ({ error: { validationErrors, serverError } }) => {
+      const flattenedErrors = flattenValidationErrors(validationErrors);
+      toast.error(serverError ?? flattenedErrors.formErrors[0]);
+    },
 
-  const [selectedProducts, setSelectedProducts] = useState<SelectedProducts[]>([])
+    onSuccess: () => {
+      toast.success("Venda realizada com sucesso.");
+      setSheetIsOpen(false);
+    },
+  });
 
-  const form = useForm({
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       productId: "",
       quantity: 1,
     },
-  }
-  );
+  });
+
   const onSubmit = (data: FormSchema) => {
     const selectedProduct = products.find(
       (product) => product.id === data.productId,
     );
     if (!selectedProduct) return;
+
     setSelectedProducts((currentProducts) => {
       const existingProduct = currentProducts.find(
         (product) => product.id === selectedProduct.id,
@@ -75,15 +114,11 @@ const UpsertSheetContent = ({products, productOptions, setSheetIsOpen}: UpsertSh
           return currentProducts;
         }
         form.reset();
-        return currentProducts.map((product) => {
-          if (product.id === selectedProduct.id) {
-            return {
-              ...product,
-              quantity: product.quantity + data.quantity,
-            };
-          }
-          return product;
-        });
+        return currentProducts.map((product) =>
+          product.id === selectedProduct.id
+            ? { ...product, quantity: product.quantity + data.quantity }
+            : product,
+        );
       }
       const productIsOutOfStock = data.quantity > selectedProduct.stock;
       if (productIsOutOfStock) {
@@ -103,37 +138,28 @@ const UpsertSheetContent = ({products, productOptions, setSheetIsOpen}: UpsertSh
       ];
     });
   };
-  form.reset();
 
+  const productsTotal = useMemo(() => {
+    return selectedProducts.reduce(
+      (acc, product) => acc + product.price * product.quantity,
+      0,
+    );
+  }, [selectedProducts]);
 
-const productsTotal = useMemo(() => {
-  return selectedProducts.reduce((acc, product) => {
-    return acc + product.price * product.quantity;
-  }, 0);
-}, [selectedProducts]);
+  const handleDeleteProduct = (productId: string) => {
+    setSelectedProducts((currentProducts) =>
+      currentProducts.filter((product) => product.id !== productId),
+    );
+  };
 
-const handleDeleteProduct = (productId: string) => {
-  setSelectedProducts((currentProducts) => {
-    return currentProducts.filter((product) => product.id !== productId);
-  });
-};
-
-const onSubmitSale = async () => {
-  try{
-    await createSale({
+  const onSubmitSale = async () => {
+    executeCreateSale({
       products: selectedProducts.map((product) => ({
         id: product.id,
         quantity: product.quantity,
       })),
     });
-    toast.success("Venda salva com sucesso.");
-    setSheetIsOpen(false); 
-  } catch (error) {
-    
-    toast.error("Erro ao salvar a venda.");
-  }
-};
-
+  };
 
   return (
     <SheetContent className="!max-w-[700px]">
@@ -163,7 +189,6 @@ const onSubmitSale = async () => {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="quantity"
@@ -192,7 +217,6 @@ const onSubmitSale = async () => {
       <Table>
         <TableCaption>Lista dos produtos adicionados à venda.</TableCaption>
         <TableHeader>
-          
           <TableRow>
             <TableHead>Produto</TableHead>
             <TableHead>Preço Unitário</TableHead>
@@ -211,7 +235,10 @@ const onSubmitSale = async () => {
                 {formatCurrency(product.price * product.quantity)}
               </TableCell>
               <TableCell>
-                  <SalesTableDropdownMenu product={product} onDelete={handleDeleteProduct}/>
+                <SalesTableDropdownMenu
+                  product={product}
+                  onDelete={handleDeleteProduct}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -220,14 +247,18 @@ const onSubmitSale = async () => {
           <TableRow>
             <TableCell colSpan={3}>Total</TableCell>
             <TableCell>{formatCurrency(productsTotal)}</TableCell>
-            <TableCell></TableCell>
+            <TableCell />
           </TableRow>
         </TableFooter>
       </Table>
 
       <SheetFooter className="pt-6">
-        <Button className="w-full gap-2" disabled={productsTotal === 0} onClick={onSubmitSale} >
-          <CheckIcon size={20}/>
+        <Button
+          className="w-full gap-2"
+          disabled={productsTotal === 0}
+          onClick={onSubmitSale}
+        >
+          <CheckIcon size={20} />
           Finalizar venda
         </Button>
       </SheetFooter>

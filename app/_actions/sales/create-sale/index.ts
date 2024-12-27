@@ -2,12 +2,13 @@
 
 import { db } from "@/app/_lib/prisma";
 import { revalidatePath } from "next/cache";
-import { createSaleSchema, CreateSaleSchema } from "./schema";
+import { createSaleSchema } from "./schema";
+import { actionClient } from "@/app/_lib/safe-action";
+import { returnValidationErrors } from "next-safe-action";
 
 
-
-export const createSale = async (data: CreateSaleSchema) => {
-  createSaleSchema.parse(data) 
+export const createSale = actionClient.schema(createSaleSchema).action(async({parsedInput: {products}}) =>{
+ 
   await db.$transaction(async (trx) => {
        const sale = await trx.sale.create({
     data: {
@@ -15,7 +16,7 @@ export const createSale = async (data: CreateSaleSchema) => {
 
     },
   });
-  for (const product of data.products) {
+  for (const product of products) {
     const productFromDb = ( await db.product.findUnique({
       where: {
         id: product.id,
@@ -23,12 +24,16 @@ export const createSale = async (data: CreateSaleSchema) => {
     }))
 
     if (!productFromDb) { 
-      throw new Error("Erro ao encontrar o produto");
+      returnValidationErrors(createSaleSchema, {
+        _errors: ["Product not found."],
+      });
     }
 
     const productIsOutOfStock = productFromDb.stock < product.quantity;
     if (productIsOutOfStock) {
-      throw new Error("O estoque do produto é insuficiente.");
+      returnValidationErrors(createSaleSchema, {
+        _errors: ["Product is out of stock."],
+      });
     }
     
     await trx.saleProduct.create({
@@ -54,5 +59,4 @@ export const createSale = async (data: CreateSaleSchema) => {
 
   revalidatePath("/products");
   })
- 
-}
+})
