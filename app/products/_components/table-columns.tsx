@@ -1,10 +1,10 @@
 "use client"
 
 import { Badge } from "@/app/_components/ui/badge"
+import { ProductDto } from "@/app/_data-acess/product/get-products"
 import { ColumnDef } from "@tanstack/react-table"
 import { CircleIcon } from "lucide-react"
 import ProductDropdown from "./product-dropdawn"
-import { Product } from "@prisma/client"
 
 
 export type Payment = {
@@ -22,7 +22,7 @@ const getStatusLabel = (status:string) => {
 }
 
 
-export const ProductsTableColumns: ColumnDef<Product>[] = [
+export const ProductsTableColumns: ColumnDef<ProductDto>[] = [
   {
     accessorKey:"name",
     header: "Nome",
