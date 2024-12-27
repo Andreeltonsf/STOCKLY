@@ -3,8 +3,13 @@
 import { db } from "@/app/_lib/prisma";
 import { revalidatePath } from "next/cache";
 import { upsertProductSchema, UpsertProductSchema } from "./schema";
+import { actionClient } from "@/app/_lib/safe-action";
 
-// Exemplo de um tipo que a lib "next-safe-action" pode exigir
+
+
+export const upsertProductAction = actionClient.schema(upsertProductSchema).action(async ({parsedInput}: Safe) => {})
+
+
 type SafeActionResult<T> = {
   data?: T;
   error?: string;
