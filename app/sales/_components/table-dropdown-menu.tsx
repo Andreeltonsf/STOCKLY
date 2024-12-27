@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/app/_components/ui/button"
 import { DropdownMenuContent, DropdownMenuItem } from "@/app/_components/ui/dropdown-menu"
 import { Product } from "@prisma/client"

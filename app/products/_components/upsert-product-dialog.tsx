@@ -65,6 +65,8 @@ const UpsertProductDialogContent = ({
     executeUpsertProduct({ ...data, id: defaultValues?.id });
   };
 
+
+
   const isEditing = !!defaultValues;
 
   return (
