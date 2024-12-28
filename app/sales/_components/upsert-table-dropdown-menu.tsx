@@ -8,12 +8,12 @@ import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu
 import { ClipboardCopyIcon, MoreHorizontalIcon, Trash2Icon } from "lucide-react"
 
 
-interface ProductTableDropdownMenuProps {
+interface UpsertTableDropdownMenuProps {
   product: Pick<Product, "id">;
   onDelete: (productId: string) => void;
 }
 
-const SalesTableDropdownMenu = ({product, onDelete}: ProductTableDropdownMenuProps) => {
+const UpsertSalesTableDropdownMenu = ({product, onDelete}: UpsertTableDropdownMenuProps) => {
   return (
 
     <DropdownMenu>
@@ -39,4 +39,4 @@ const SalesTableDropdownMenu = ({product, onDelete}: ProductTableDropdownMenuPro
    )}
 
 
-export default SalesTableDropdownMenu 
+export default UpsertSalesTableDropdownMenu

@@ -41,7 +41,7 @@ import {
   SheetTitle,
 } from "../../_components/ui/sheet";
 import { formatCurrency } from "../../_helpers/current";
-import SalesTableDropdownMenu from "./table-dropdown-menu";
+import UpsertSalesTableDropdownMenu from "./upsert-table-dropdown-menu";
 
 const formSchema = z.object({
   productId: z.string().uuid({
@@ -235,7 +235,7 @@ const UpsertSheetContent = ({
                 {formatCurrency(product.price * product.quantity)}
               </TableCell>
               <TableCell>
-                <SalesTableDropdownMenu
+                < UpsertSalesTableDropdownMenu
                   product={product}
                   onDelete={handleDeleteProduct}
                 />
