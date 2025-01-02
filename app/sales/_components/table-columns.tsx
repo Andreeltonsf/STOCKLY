@@ -1,14 +1,19 @@
 "use client"
 
 
+import { ComboboxOption } from "@/app/_components/ui/combobox";
+import { ProductDto } from "@/app/_data-acess/product/get-products";
 import { SalesDto } from "@/app/_data-acess/sales/get-sales";
 import { formatCurrency } from "@/app/_helpers/current";
 import { ColumnDef } from "@tanstack/react-table";
 import SalesTableDropdownMenu from "./table-dropdown-menu";
 
+interface SalesTableColumns extends SalesDto {
+  products: ProductDto[];
+  productOptions: ComboboxOption[];
+}
 
-
-export const saleTableColumns: ColumnDef<SalesDto>[] = [
+export const saleTableColumns: ColumnDef<SalesTableColumns>[] = [
   {
     accessorKey: "productNames",
     header: "Produtos",
@@ -30,6 +35,6 @@ export const saleTableColumns: ColumnDef<SalesDto>[] = [
   },
   {
     header: "Ações",
-    cell: ({row:{original:sale}}) => <SalesTableDropdownMenu sales={sale}/>,
+    cell: ({row:{original:sale}}) => <SalesTableDropdownMenu sales={sale} productOptions={sale.productOptions} products={sale.products}/>,
   }
 ]

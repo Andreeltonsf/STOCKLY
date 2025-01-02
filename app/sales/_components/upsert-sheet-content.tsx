@@ -1,6 +1,6 @@
 "use client"
 
-import { createSale } from "@/app/_actions/sales/create-sale";
+import { upsertSale } from "@/app/_actions/sales/upsert-sales";
 import { Button } from "@/app/_components/ui/button";
 import { Combobox, ComboboxOption } from "@/app/_components/ui/combobox";
 import {
@@ -13,8 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/_components/ui/table";
+import { ProductDto } from "@/app/_data-acess/product/get-products";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Product } from "@prisma/client";
 import { CheckIcon, PlusIcon } from "lucide-react";
 import {
   flattenValidationErrors
@@ -53,9 +53,11 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 interface UpsertSheetContentProps {
-  products: Product[];
+  saleId?: string;
+  products: ProductDto[];
   productOptions: ComboboxOption[];
   setSheetIsOpen: Dispatch<SetStateAction<boolean>>;
+  defaultSelectedProducts?: SelectedProducts[];
 }
 
 interface SelectedProducts {
@@ -66,15 +68,17 @@ interface SelectedProducts {
 }
 
 const UpsertSheetContent = ({
+  saleId,
   products,
   productOptions,
   setSheetIsOpen,
+  defaultSelectedProducts,
 }: UpsertSheetContentProps) => {
   const [selectedProducts, setSelectedProducts] = useState<SelectedProducts[]>(
-    [],
+    defaultSelectedProducts ?? [],
   );
 
-  const { execute: executeCreateSale } = useAction(createSale, {
+  const { execute: executeUpsertSale } = useAction(upsertSale, {
     onError: ({ error: { validationErrors, serverError } }) => {
       const flattenedErrors = flattenValidationErrors(validationErrors);
       toast.error(serverError ?? flattenedErrors.formErrors[0]);
@@ -153,7 +157,8 @@ const UpsertSheetContent = ({
   };
 
   const onSubmitSale = async () => {
-    executeCreateSale({
+    executeUpsertSale({
+      id: saleId,
       products: selectedProducts.map((product) => ({
         id: product.id,
         quantity: product.quantity,
