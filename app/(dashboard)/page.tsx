@@ -2,16 +2,17 @@ import { CircleDollarSignIcon, DollarSign, PackageIcon, ShoppingBasketIcon } fro
 import Header, { HeaderLeft, HeaderSubtitle, HeaderTitle } from "../_components/Header";
 import { getDashboard } from "../_data-acess/dashboard/get-dashboard";
 import { formatCurrency } from "../_helpers/current";
+import RevenueCard from "./_components/revenue-card";
 import SummaryCard, { SummaryCardIcon, SummaryCardTitle, SummaryCardValue } from "./_components/summary-card";
 
 
 
 
  const Home = async() => {
-  const { totalRevenue, todayRevenue, totalSales, totalStock, totalProducts } = await getDashboard();
+  const { totalRevenue, todayRevenue, totalSales, totalStock, totalProducts, totalLast14DaysRevenue } = await getDashboard();
   return (
    
-    <div className="m-8 w-full space-y-8 rounded-lg " >
+    <div className="m-8 w-full space-y-8 rounded-lg flex flex-col" >
           <Header>
             <HeaderLeft>
               <HeaderTitle>Dashboard</HeaderTitle>
@@ -65,10 +66,19 @@ import SummaryCard, { SummaryCardIcon, SummaryCardTitle, SummaryCardValue } from
               <SummaryCardValue>{totalProducts}</SummaryCardValue>
             </SummaryCard>
           </div>
+
+          <div className="flex h-full flex-col overflow-hidden rounded-xl bg-white p-6">
+            <p className="text-lg font-semibold text-slate-900">
+              Receita 
+            </p>
+              <p className="text-sm text-slate-400">Ultimos 14 dias</p>
+            <RevenueCard data={totalLast14DaysRevenue}/>
+            
+          </div>
         
     </div>
   );
-}
+};  
 
 
 export default Home;

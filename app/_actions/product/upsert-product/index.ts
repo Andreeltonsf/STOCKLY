@@ -13,5 +13,5 @@ export const upsertProduct = actionClient.schema(upsertProductSchema).action(asy
     update: data,
     create: data,
   });
-  revalidatePath("/products");
+  revalidatePath("/","page")
 })
