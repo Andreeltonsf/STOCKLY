@@ -67,14 +67,16 @@ import SummaryCard, { SummaryCardIcon, SummaryCardTitle, SummaryCardValue } from
             </SummaryCard>
           </div>
 
-          <div className="flex h-full flex-col overflow-hidden rounded-xl bg-white p-6">
-            <p className="text-lg font-semibold text-slate-900">
-              Receita 
-            </p>
-              <p className="text-sm text-slate-400">Ultimos 14 dias</p>
+          <div className="flex h-[400px] w-full flex-col overflow-hidden rounded-xl bg-white p-6">
+            <p className="text-lg font-semibold text-slate-900">Receita</p>
+            <p className="text-sm text-slate-400">Últimos 14 dias</p>
             <RevenueCard data={totalLast14DaysRevenue}/>
-            
           </div>
+
+
+          
+
+
         
     </div>
   );
@@ -82,3 +84,5 @@ import SummaryCard, { SummaryCardIcon, SummaryCardTitle, SummaryCardValue } from
 
 
 export default Home;
+
+

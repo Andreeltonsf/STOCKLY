@@ -30,6 +30,7 @@ export const getDashboard = async (): Promise<DashboardDto> => {
     const dayTotalRevenue = await db.$queryRawUnsafe<{totalRevenue:number}[]>(`
           SELECT SUM("unitPrice" * "quantity")  as "totalRevenue" 
           FROM "SaleProduct"
+          JOIN "Sale" ON "SaleProduct"."saleId" = "Sale"."id"
           WHERE "createdAt" >= $1 and "createdAt" < $2;`,
   
       day.startOf('day').toDate(), 
@@ -44,12 +45,14 @@ export const getDashboard = async (): Promise<DashboardDto> => {
   const totalRevenueQuery = `
   SELECT SUM("unitPrice" * "quantity")  as "totalRevenue" 
   FROM "SaleProduct"
+  JOIN "Sale" ON "SaleProduct"."saleId" = "Sale"."id"
   `
 
   const todayRevenueQuery =
     ` SELECT SUM("unitPrice" * "quantity")  as "todayRevenue" 
       FROM "SaleProduct"
       WHERE "createdAt" >= $1 and "createdAt" < $2;
+      JOIN "Sale" ON "SaleProduct"."saleId" = "Sale"."id"
   `
     
         const startOfDay = new Date(new Date().setHours(0, 0, 0, 0))
