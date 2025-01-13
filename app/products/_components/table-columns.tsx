@@ -1,9 +1,8 @@
 "use client"
 
-import { Badge } from "@/app/_components/ui/badge"
+import ProductStatusBadge from "@/app/_components/product-status-badge"
 import { ProductDto } from "@/app/_data-acess/product/get-products"
 import { ColumnDef } from "@tanstack/react-table"
-import { CircleIcon } from "lucide-react"
 import ProductDropdown from "./product-dropdawn"
 
 
@@ -14,12 +13,6 @@ export type Payment = {
   email: string
 }
 
-
-const getStatusLabel = (status:string) => {
-  if(status === 'IN_STOCK') {return 'Em Estoque'}
-
-  return 'Fora de Estoque'
-}
 
 
 export const ProductsTableColumns: ColumnDef<ProductDto>[] = [
@@ -38,15 +31,13 @@ export const ProductsTableColumns: ColumnDef<ProductDto>[] = [
   {
     accessorKey:"status", 
     header: "Status",
-    cell: (row) => {
-      const product = row.row.original
+    cell: ({row:{original:product}}) => {
       
-      const label = getStatusLabel(product.status)
+      
+      
       return (
-      <Badge variant={label === 'Em Estoque'? 'default' :'outline'  }  className="gap-1.5">
-        <CircleIcon className={`${label} === 'Em estoque`? 'fill-primary-foreground' : 'fill-destructive-foreground'}size={14}/>
-        {label}
-        </Badge>)
+        <ProductStatusBadge status={product.status} />
+      )
 
     }
   }, 

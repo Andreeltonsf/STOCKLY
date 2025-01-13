@@ -3,9 +3,9 @@ import { Product } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 import "server-only";
 
-
+export type ProductStatus = "IN_STOCK" | "OUT_OF_STOCK";
 export interface ProductDto extends Product{
-  status: "IN_STOCK" | "OUT_OF_STOCK";
+  status: ProductStatus
 
 }
 
